@@ -84,7 +84,7 @@ plot(y_test, Results_PP$y_hat_test[,2], xlab="Response", ylab = "Estimated respo
 
 ## Data analysis
 
-To run this code, you would first need to run the code provided in the <a href="./Help_files/Data_processing.md">data processing file</a> to get the objects `PPP_obs`, `PPP_test`, `y`, `y_test`.
+To run this code, you would first need to run the code provided in the <a href="./Help_files/Data_processing.md">data processing file</a> to get the objects `PPP_obs`, `PPP_test`, `y`, and `y_test`.
 
 ### Model fitting
 
