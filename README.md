@@ -84,18 +84,28 @@ Results_Left <- P3LS:::P3LS(PPP_obs, PPP_test, y, y_test, h=2, p=10, q=10, T=100
 
 ### Plots
 
+#### Plot of the estimated coefficient function
+
 ```r
-# Plotof the estimated coefficient function
 plot(Results_Left$b_hat[,2], lty=1, main = "Coefficient Function - Left Kidney", type="l", ylab="", xlab = "time index", ylim=c(-.02,.025))
+```
 
-# Plot of the first PLS basis function
+<img src="./P3LS_plots/Coeff_fun_left.jpeg" alt="" width="600px">
+
+#### Plot of the first PLS basis function
+
+```r
 plot(Results_Left$basis[,1], xlab=", ylab=", main="Frist PLS basis function - Left Kidnay")
+```
 
-# Plot of the second PLS basis function
+<img src="./P3LS_plots/1sr_basis_left.jpeg" alt="" width="600px">
+
+#### Plot of the second PLS basis function
+
+```r
 plot(Results_Left$basis[,2], xlab=", ylab=", main="Second PLS basis function - Left Kidnay")
 
-# Plot of the square root of MSPE for p=1,...,10
-plot(1:10, Results_Left$rMSPE_test, xlab="Number of PLS basis functions - Left Kidney", ylab="rMSPE", main="Square root of MSPE")
-
 ```
+
+<img src="./P3LS_plots/2nd_basis_left.jpeg" alt="" width="600px">
 
