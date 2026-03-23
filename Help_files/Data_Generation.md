@@ -2,161 +2,84 @@
 We suggest to call the following libraries before running the examples.
 
 ```r
+library(spatstat)
+library(fda)
+library(nhppp)
 library(mvtnorm)
-library(astsa)
-library(waveslim)
-library(dplR)
-
+library(Matrix)
+library(pracma)
+library(fdapace)
 ```
 
-## Time Domain
+## Data generation
 
-The R-code provided below generates the dataframe `D` in the R package. Detailed description of the process is provided in the manuscript. 
+The R-code provided below generates the dataset `D_sim` in the R package. This corresponds to Case  of the simulation setting described in the manuscript. 
 
 
 ```r
-set.seed(1000*3+12)
+set.seed(12345)
 
-#####################
-## Data Generation ##
-#####################
-p <- 64
-n <- 1024
-phi_1 <- 1.5
-phi_2 <- -.75
-a1 <- 1/20
-a2 <- -1/1.15
-c1 <- 3
-omega <- seq(0,.5, length.out = n/2)
+## Log intensity functions
+n_basis <- 20
+n_obs <- 100
+n_test <- 100
+bspl8 <- create.bspline.basis(rangeval = c(0,24), nbasis=n_basis)
+eta <- 10
+X_list_nobs <- lapply(1:(n_obs+n_test), function(i) fd(c(0, rnorm(1,12,4), rnorm(1,20,10), rnorm(1,20,10), rnorm(1,20,10),rnorm(1,20,10),rnorm(1,20,10),
+                                                         rnorm(1,20,10), rnorm(1,20,10),rnorm(1,20,10), rnorm(1,20,10), rnorm(1,20,10), rnorm(1,20,10), rnorm(1,20,10), rnorm(1,20,10), rnorm(1,20,10), rnorm(1,20,10),rnorm(1,20,10), rnorm(1,20,10), rnorm(1,12,4))/eta + 2.8, bspl8))
 
-len_freq <- n/2
+X_list <- X_list_nobs[1:n_obs]
+X_list_test <- X_list_nobs[(n_obs+1):(n_obs+n_test)]
 
-Xt10 <- arima.sim(list(order=c(4,0,0), ar=c(a1+phi_1,a2-a1*phi_1+phi_2,-(phi_1*a2+phi_2*a1), -phi_2*a2)), n = n)*(1/c1)
-Xt1 <- pass.filt(Xt10, W=c(0.05, 0.25), type="pass", method = "Butterworth")
-temp1 <- arma.spec(ar=c(a1+phi_1,a2-a1*phi_1+phi_2,-(phi_1*a2+phi_2*a1), -phi_2*a2), main="Autoregression")
+## Coefficient function
+b1 <-  fd(c(0, 1, 1, 1, 1,1,1,1,1, 1, -1, -1, -1,-1,-1,-1,-1,-1,-1,-1), bspl8)
 
-phi_1 <- 1.5 +.05
-yt20 <- arima.sim(list(order=c(4,0,0), ar=c(a1+phi_1,a2-a1*phi_1+phi_2,-(phi_1*a2+phi_2*a1), -phi_2*a2)), n = n)*(1/c1)
-yt2 <- pass.filt(yt20, W=c(0.05, 0.25), type="pass", method = "Butterworth")
-temp2 <- arma.spec(ar=c(a1+phi_1,a2-a1*phi_1+phi_2,-(phi_1*a2+phi_2*a1), -phi_2*a2), main="Autoregression")
+## Response
 
-phi_1 <- 1.5 -.05
-yt30 <- arima.sim(list(order=c(4,0,0), ar=c(a1+phi_1,a2-a1*phi_1+phi_2,-(phi_1*a2+phi_2*a1), -phi_2*a2)), n = n)*(1/c1)
-yt3 <- pass.filt(yt30, W=c(0.05, 0.25), type="pass", method = "Butterworth")
-temp3 <- arma.spec(ar=c(a1+phi_1,a2-a1*phi_1+phi_2,-(phi_1*a2+phi_2*a1), -phi_2*a2), main="Autoregression")
-
-phi_1 <- 1.5 +.15
-yt40 <- arima.sim(list(order=c(4,0,0), ar=c(a1+phi_1,a2-a1*phi_1+phi_2,-(phi_1*a2+phi_2*a1), -phi_2*a2)), n = n)*(1/c1)
-yt4 <- pass.filt(yt40, W=c(0.05, 0.25), type="pass", method = "Butterworth")
-temp4 <- arma.spec(ar=c(a1+phi_1,a2-a1*phi_1+phi_2,-(phi_1*a2+phi_2*a1), -phi_2*a2), main="Autoregression")
-
-phi_1 <- 1.5 -.15
-yt50 <- arima.sim(list(order=c(4,0,0), ar=c(a1+phi_1,a2-a1*phi_1+phi_2,-(phi_1*a2+phi_2*a1), -phi_2*a2)), n = n)*(1/c1)
-yt5 <- pass.filt(yt50, W=c(0.05, 0.25), type="pass", method = "Butterworth")
-temp5 <- arma.spec(ar=c(a1+phi_1,a2-a1*phi_1+phi_2,-(phi_1*a2+phi_2*a1), -phi_2*a2), main="Autoregression")
-
-Xt2 <- 2*1.1*Xt1 + 1*yt2 + rnorm(n,0,1/2)
-Xt3 <- 1.2*Xt1 + yt3 + rnorm(n,0,1/2)
-Xt4 <- 1.25*Xt1 + 1*yt4 + rnorm(n,0,1/2)
-Xt5 <- 3*0.75*Xt1 + 3*yt5 + rnorm(n,0,1/2)
-
-X_omega_2 <- cbind(Xt1,Xt2,Xt3,Xt4,Xt5)
-X_wn <- rmvnorm(n, sigma = diag(p-(ncol(X_omega_2))))
-D <- cbind(X_omega_2, X_wn)
-
-## End of data generation ##
-############################
-```
-
-## Population Spectral Density Matrices
-The R-code provided below produces the spectral density matrices of the process provided in the manuscript. 
-
-```r
-#############################################################################
-## Below is the code to construct the population spectral density matrices
-## Population Spectral Density Matrices
-f_xx <- array(0,dim=c(p,p,length(omega)))
-c1 <- 3
-f_x_omega0 <- (1/c1^2)*arma.spec(ar=c(a1+phi_1,a2-a1*phi_1+phi_2,-(phi_1*a2+phi_2*a1), -phi_2*a2), n.freq = n/2)$spec
-phi_1 <- 1.5 +.05
-f20 <- (1/c1^2)*arma.spec(ar=c(a1+phi_1,a2-a1*phi_1+phi_2,-(phi_1*a2+phi_2*a1), -phi_2*a2), n.freq = n/2)$spec
-phi_1 <- 1.5 -.05
-f30 <- (1/c1^2)*arma.spec(ar=c(a1+phi_1,a2-a1*phi_1+phi_2,-(phi_1*a2+phi_2*a1), -phi_2*a2), n.freq = n/2)$spec
-phi_1 <- 1.5 +.15
-f40 <- (1/c1^2)*arma.spec(ar=c(a1+phi_1,a2-a1*phi_1+phi_2,-(phi_1*a2+phi_2*a1), -phi_2*a2), n.freq = n/2)$spec
-phi_1 <- 1.5 -.15
-f50 <- (1/c1^2)*arma.spec(ar=c(a1+phi_1,a2-a1*phi_1+phi_2,-(phi_1*a2+phi_2*a1), -phi_2*a2), n.freq = n/2)$spec
-
-f_x_omega <- f_x_omega0
-for(ell in 1:length(omega)) {
-  o_ell <- omega[ell]
-  if( !(((o_ell >= .05) & (o_ell <= .25))  ) ) f_x_omega[ell] <- 0
-}
-f2 <- f20
-for(ell in 1:length(omega)) {
-  o_ell <- omega[ell]
-  if( !(((o_ell >= .05) & (o_ell <= .25))  ) ) f2[ell] <- 0
-}
-f3 <- f30
-for(ell in 1:length(omega)) {
-  o_ell <- omega[ell]
-  if( !(((o_ell >= .05) & (o_ell <= .25))  ) ) f3[ell] <- 0
-}
-f4 <- f40
-for(ell in 1:length(omega)) {
-  o_ell <- omega[ell]
-  if( !(((o_ell >= .05) & (o_ell <= .25))  ) ) f4[ell] <- 0
-}
-f5 <- f50
-for(ell in 1:length(omega)) {
-  o_ell <- omega[ell]
-  if( !(((o_ell >= .05) & (o_ell <= .25))  ) ) f5[ell] <- 0
+### Training set
+y <- rep(0,n_obs)
+for(i in 1:n_obs){
+  integrad <- function(t) predict.fd(b1, t)*predict.fd(X_list[[i]], t)
+  y[i] <- integrate(integrad, lower = 0, upper = 24)$value + rnorm(1,0,1)
 }
 
-f_e <- 1/4
-for(ell in 1:length(omega)){
-  f_xx[,,ell] <- diag(f_e, p)
-  f_xx[1:5,1:5,ell] <- matrix(c(f_x_omega[ell],(2*1.1)*f_x_omega[ell],1.2*f_x_omega[ell],1.25*f_x_omega[ell], 3*.75*f_x_omega[ell],
-                                2*1.1*f_x_omega[ell], 4*1.1*1.1*f_x_omega[ell]+f_e+1*f2[ell], 2*1.1*1.2*f_x_omega[ell],2*1.1*1.25*f_x_omega[ell],2*1.1*3*.75*f_x_omega[ell],
-                                1.2*f_x_omega[ell], 2*1.1*1.2*f_x_omega[ell], 1.2*1.2*f_x_omega[ell]+f_e+f3[ell], 1.2*1.25*f_x_omega[ell],1.2*3*.75*f_x_omega[ell],
-                                1.25*f_x_omega[ell],2*1.1*1.25*f_x_omega[ell],1.2*1.25*f_x_omega[ell],1.25*1.25*f_x_omega[ell]+f_e+1*f4[ell],1.25*3*.75*f_x_omega[ell],
-                                3*.75*f_x_omega[ell],2*1.1*3*.75*f_x_omega[ell],1.2*3*.75*f_x_omega[ell],1.25*3*.75*f_x_omega[ell],9*.75*.75*f_x_omega[ell]+f_e+9*f5[ell]), nrow=5, byrow = TRUE)
+### Test set
+y_test <- rep(0,n_test)
+for(i in 1:n_test){
+  integrad <- function(t) predict.fd(b1, t)*predict.fd(X_list_test[[i]], t)
+  y_test[i] <- integrate(integrad, lower = 0, upper = 24)$value + rnorm(1,0,1)
 }
 
 
-## Leading eigenvector of the population spectral density matrices
-f_evec11 <- matrix(0, nrow=p, ncol = length(omega))
-for(ell in 1:length(omega)){
-  f_evec_ell <- eigen(f_xx[,,ell])$vectors[,1]
-  f_evec11[,ell] <- f_evec_ell
-  #gc()
+n <- n_obs
+T <- 100
+lower <- 0
+upper <- 24
+del <- (upper-lower)/T
+T_seq <- seq(0,24,length.out=T)
+X <- matrix(unlist(lapply(X_list, function(x) predict.fd(x,T_seq))), nrow = n_obs, byrow = TRUE)
+Xc <- t(t(X) - colMeans(X))
+yc <- y - mean(y)
+K_hat <- (1/n_obs)*t(Xc)%*%Xc
+
+y_bar <- mean(y)
+
+inprod_mat <- function(u1,u2,K_hat, lower, upper){
+  del <- (upper-lower)/length(u1)
+  value <- (del^2)*t(u1)%*%K_hat%*%u2
+  return(value[1,1])
 }
 
-```
+## Point process generation
+PPP_obs_all <- lapply(X_list_nobs, function(x) draw_intensity(lambda = function(t) exp(predict.fd(x, t)), range_t = c(0,24), lambda_maj = c(intercept = 50000+max(exp(predict.fd(x, T_seq))))))
+PPP_obs <- PPP_obs_all[1:n_obs]
+PPP_test <- PPP_obs_all[(n_obs+1):(n_obs+n_test)]
 
-## Spectral Density Estimation
+## D_sim
+b <- predict.fd(b1, T_seq)
+X_list_all <- X_list_nobs
+y_obs <- y
 
-The R-code provided below estimates the spectral density matrices of the time series simulated above. This reproduces the object `f_D` in the R package.
-
-```r
-
-## Estimation of the Spectral Density Matrices
-U <- sine.taper(n,20)
-X_tp <- apply(U, MARGIN = 2, function(u) u*D, simplify = FALSE)
-F_tp_list <- lapply(X_tp, FUN = function(Y) mvspec(Y,plot = FALSE) )
-
-len_freq <- n/2
-F_tp1 <- array(0, c(p, p, len_freq))
-for (ell in 1:len_freq) {
-  for(j in 1:length(F_tp_list)){
-    F_tp1[,,ell] <- F_tp1[,,ell] + F_tp_list[[j]]$fxx[,,ell]
-  }
-  F_tp1[,,ell] <- F_tp1[,,ell]/length(F_tp_list)
-}
-f_D <- F_tp1*n
-rm(U)
-rm(X_tp)
-rm(F_tp_list)
-gc()
+D_sim <- list("PPP_obs" = PPP_obs, "PPP_test" = PPP_test, "y_obs" =  y_obs, "y_test" = y_test, "b" = b, "X_list_all" =  X_list_all)
 
 ```
