@@ -56,17 +56,23 @@ Results_PP <- P3LS(D_sim$PPP_obs, D_sim$PPP_test, D_sim$y_obs, D_sim$y_test, h=2
 
 #### Plots
 
+##### Plot of the estimated coefficient function
 ```r
-## Plot of the estimated coefficient function
 plot(seq(0,24,length.out=100), Results_PP$b_hat[,2], type='l', xlab = "t", ylab = "b(t)", main = "Coefficient function - Case 2")
 points(seq(0,24,length.out=100), b, type="l", col="blue")
 legend("topright", legend = c("estimated", "true"), lty=c(1,1), col = c("black", "blue"))
+```
 
+<img src="./P3LS_plots/coefficient_function.jpeg" alt="" width="600px">
 
-## Plot of Y_hat_Test vs y_test
+##### Plot of the predicted vs the response in the test set
+
+```r
 plot(y_test, Results_PP$y_hat_test[,2], xlab="Response", ylab = "Estimated response", main = "Test data")
 
 ```
+
+<img src="./P3LS_plots/response_true_vs_predicted.jpeg" alt="" width="600px">
 
 ## Data analysis
 
