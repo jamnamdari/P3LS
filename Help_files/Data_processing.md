@@ -12,7 +12,7 @@ library(pracma)
 library(fdapace)
 ```
 
-Please run the following code to get the objects 
+Please run the following code to get the objects `PPP_obs`, `PPP_test`, `y`, and `y_test`. 
 
 
 ```r
