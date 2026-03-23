@@ -16,7 +16,7 @@ The R package contains two datasets `D` and `D_sim`. The dataset `D_sim` contain
 
 ### Simulated data
 
-`D_sim` is a list containing the following objects.
+`D_sim` is a list containing the following objects. Detailed instruction on how to generate the samples are privided in the <a href="./Help_files/Data_Generation.md">data generation file</a>.
 
 + `PPP_obs`: a list of 100 realizations of the point process described in the paper used as the training data.
 + `PPP_test`: a list of 100 realizations of the point process described in the paper used as the testing data.  
@@ -27,9 +27,9 @@ The R package contains two datasets `D` and `D_sim`. The dataset `D_sim` contain
 
 ### Real data
 
-`D` contains renogram information of the left kidnies of the patients in the study. It is a dataframe containing the following components.
+`D` contains ontains the Renogram data and an experts ratings of obstruction status of the left kidney of patients who were referred to the clinic suspected with kidney obstruction.
 
-## Using the P3LS function
+## The P3LS function
 The `P3LS` function accepts implements the P3LS algorithem. Arguments of the function are as follows.
 
 + `PPP_obs`: A list containing vectors of tarining point process observed times.
@@ -45,6 +45,14 @@ The `P3LS` function accepts implements the P3LS algorithem. Arguments of the fun
 + `nb`: Number of bins in log-intensity estimation.
 
 The function returns a list with the following elements.
+
++ `b_hat`: is a T by p matrix. Column k=1,...,p contains estimated coefficient function (using k PLS basis functions) evaluated on the grid of points of length T over [ldb,ubd].
++ `y_hat`: is a T by p matrix. Column k=1,...,p contains predicted response values of the training data (using k PLS basis functions).
++ `BIC`: is a vector of length p. It`s k-th element, k=1,...,p, contains BIC critetian for the number of babsis functions (k) used in estimation of the coefficient function b.
++ `y_hat_test`: is a n_test by p matrix, where n_test is the number of testing subjects. Column k=1,...,p contains predicted response values of the testing data.
++ `basis`: The PLS basis functions. It computed the first p=10 basis functions evaluated on the grid of points of length T over [ldb,ubd].
++ `rMSPE_test`: is a vector of length p. It`s k-th element, k=1,...,p, contains the square root of the MSPE of the testing data set (using k PLS basis functions).
+
 
 ### Example
 
@@ -75,6 +83,8 @@ plot(y_test, Results_PP$y_hat_test[,2], xlab="Response", ylab = "Estimated respo
 <img src="./P3LS_plots/response_true_vs_predicted.jpeg" alt="" width="600px">
 
 ## Data analysis
+
+To run this code, you would first need to run the code provided in the <a href="./Help_files/Data_processing.md">data processing file</a> to get the objects `PPP_obs`, `PPP_test`, `y`, `y_test`.
 
 ### Model fitting
 
