@@ -11,7 +11,7 @@ library(pracma)
 library(fdapace)
 ```
 
-## Data generation
+## Simulated Data `D_sim`
 
 The R-code provided below generates the dataset `D_sim` in the R package. This corresponds to Case  of the simulation setting described in the manuscript. 
 
