@@ -1,14 +1,7 @@
-
-
-library(gradfps)
-library(fps)  # The modified version
 library(RSpectra)
 library(mvtnorm)
 library(Matrix)
-library(astsa)
-library(lpSolve)
 library(lattice)
-library(astsa)
 library(fda)
 library(nhppp)
 library(pracma)
