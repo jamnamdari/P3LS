@@ -11,5 +11,6 @@ LazyData: true
 Depends: 
     R (>= 2.10)
 Imports: spatstat, Matrix, nhppp, fda, pracma
-remotes::install_version("nhppp", version = "0.1.3")
+remotes:
+    version::nhppp@0.1.3
 devtools::load_all() 
