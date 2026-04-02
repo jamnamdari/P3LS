@@ -6,7 +6,7 @@ library(fda)
 library(nhppp)
 library(pracma)
 library(ggplot2)
-library(mnormt)
+#library(mnormt)
 
 library(R.matlab)
 library(spatstat)
