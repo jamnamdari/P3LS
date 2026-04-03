@@ -122,6 +122,7 @@ GS <- function(u_list,K_hat, lower, upper){
 ### **Covariance estimation by point process method**
 
 Cov_estimator <- function(PROCESS, lbd, ubd, bwd, ngrid, kern="epanechnikov"){
+  library(spatstat)
   lower <- lbd
   upper <- ubd
 
@@ -481,6 +482,8 @@ PLS_Kernel <- function(PPP_obs, PPP_test = NULL, y, y_test=NULL, h, T, lbd, ubd)
 
 #' @export
 P3LS <- function(PPP_obs, PPP_test = NULL, y, y_test=NULL, h, p=10, q, T, lbd, ubd, nb = 100){
+  library(pracma)
+  library(MASS)
   p_pls <- p
   lower <- lbd
   upper <- ubd
