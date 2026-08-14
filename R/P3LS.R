@@ -205,7 +205,12 @@ PLS_Kernel <- function(PPP_obs, PPP_test = NULL, y, y_test=NULL, h, T, lbd, ubd)
   n <- n_obs
   dd <- 10
   b_hat_kr  <- matrix(0,nrow = T, ncol=dd)
-  y_hat_kr  <- matrix(0,nrow = T, ncol=dd)
+  ## y_hat_kr holds one predicted value per TRAINING SUBJECT (n_obs rows),
+  ## the same T/n mixup as yhat_test_K below (and just as silent: for
+  ## n_obs values that happen to divide T exactly, R recycles instead of
+  ## erroring, corrupting SSE_K/AIC_K/BIC_K without a warning). Matches the
+  ## correct, analogous `y_hat_pp <- matrix(0,nrow=n_obs,...)` in P3LS().
+  y_hat_kr  <- matrix(0,nrow = n_obs, ncol=dd)
   y_kr_err_l2  <- rep(0,dd)
   ## yhat_test_K holds one predicted value per TEST SUBJECT (n_test rows),
   ## not per grid point -- the original code allocated this as `nrow = T`,
