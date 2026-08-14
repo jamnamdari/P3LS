@@ -8,7 +8,8 @@ Description:  Implements an extension of functional partial least square to poin
 License: MIT
 Encoding: UTF-8
 LazyData: true
-Depends: 
+Depends:
     R (>= 2.10)
-Imports: spatstat, Matrix, nhppp, fda, pracma, nhppp (== 0.1.3), fdapace, mvtnorm
-devtools::load_all() 
+Imports: spatstat, spatstat.geom, spatstat.univar, Matrix, nhppp, fda, pracma, fdapace, mvtnorm, Rcpp
+LinkingTo: Rcpp, RcppArmadillo
+RoxygenNote: 7.3.2
