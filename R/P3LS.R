@@ -368,7 +368,12 @@ P3LS <- function(PPP_obs, PPP_test = NULL, y, y_test=NULL, h, p=10, q, T, lbd, u
   X_k <- matrix(0,nrow = n_obs, ncol = T)
   for(ell in 1:n_obs){
     Dm <- data.frame(counts = bin_counts_obs[ell,], phi = PHIsm)
-    Pm_model <- glm(counts~.+1  , family = poisson(link = "log"), data = Dm)
+    ## counts = event count / bin width, so it's a rate, not an integer --
+    ## glm() fits it fine (IRLS uses mean/variance, not dpois()), but always
+    ## computes an AIC slot via dpois(y, mu, log=TRUE), which warns on
+    ## non-integer y. That AIC value is never read below, so the warning is
+    ## suppressed rather than fixed at the source (e.g. quasipoisson()).
+    Pm_model <- suppressWarnings(glm(counts~.+1  , family = poisson(link = "log"), data = Dm))
     X_k[ell,] <- colSums(diag(Pm_model$coefficients)%*%rbind(rep(1,nb),ef))
   }
   Xkc <- t(t(X_k) - colMeans(X_k))
@@ -379,7 +384,7 @@ P3LS <- function(PPP_obs, PPP_test = NULL, y, y_test=NULL, h, p=10, q, T, lbd, u
     X_k_test <- matrix(0,nrow = n_test, ncol = T)
     for(ell in 1:n_test){
       Dm <- data.frame(counts = bin_counts_test[ell,], phi = PHIsm)
-      Pm_model <- glm(counts~.+1  , family = poisson(link = "log"), data = Dm)
+      Pm_model <- suppressWarnings(glm(counts~.+1  , family = poisson(link = "log"), data = Dm))
       X_k_test[ell,] <- colSums(diag(Pm_model$coefficients)%*%rbind(rep(1,nb),ef))
     }
     X_k_test_c <- t(t(X_k_test) - colMeans(X_k_test))
